@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -528,14 +529,15 @@ const DEFAULTS = {
   lastSavedAt: null
 };
 
+  
 let state = structuredClone(DEFAULTS);
-let initialized = false;
-let lastTick = Date.now();
-let nextAutoEventAt = Date.now() + rand(18000,34000);
-
 const $ = id => document.getElementById(id);
 const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
 const clamp = (v,min,max) => Math.max(min,Math.min(max,v));
+
+let initialized = false;
+let lastTick = Date.now();
+let nextAutoEventAt = Date.now() + rand(18000,34000);
 
 function cloneDefault(){ return structuredClone(DEFAULTS); }
 
