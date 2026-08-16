@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORYZONT-3 // System Placówki</title>
+<style>
+:root{
+  --bg:#060b09;
+  --panel:#0b1411;
+  --panel2:#0e1a16;
+  --line:#1d3a30;
+  --green:#5dff9b;
+  --green2:#1fd36f;
+  --green-dim:#2c8d58;
+  --red:#ff4e58;
+  --yellow:#ffd166;
+  --cyan:#66e6ff;
+  --text:#d9f4e5;
+  --muted:#739488;
+  --shadow:0 0 30px rgba(50,255,145,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:radial-gradient(circle at 20% 10%,rgba(40,110,75,.14),transparent 35%),radial-gradient(circle at 80% 90%,rgba(160,30,40,.08),transparent 35%),var(--bg);color:var(--text);font-family:"Courier New",ui-monospace,monospace}
+body{overflow-x:hidden}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.035;
+  background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);
+  background-size:4px 4px;z-index:9999
+}
+.hidden{display:none!important}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.glow{ text-shadow:0 0 10px rgba(93,255,155,.35)}
+#boot,#login{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px
+}
+.boot-box,.login-box{
+  width:min(780px,100%);background:rgba(6,14,11,.94);border:1px solid var(--line);box-shadow:var(--shadow),0 0 60px rgba(0,0,0,.35);padding:30px;position:relative
+}
+.boot-title{font-size:44px;letter-spacing:8px;color:var(--green);margin:0 0 6px}
+.boot-sub{color:var(--muted);margin:0 0 22px}
+.terminal{height:260px;overflow:hidden;background:#030705;border:1px solid #163027;padding:14px;color:#78e8a7;line-height:1.6;font-size:13px}
+.progress{height:7px;background:#101a16;border:1px solid #1d392e;margin:18px 0 0}
+.progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green2),var(--green));box-shadow:0 0 12px rgba(31,211,111,.6);transition:width .2s}
+.login-box{max-width:460px}
+.login-mark{font-size:13px;color:var(--green-dim);letter-spacing:4px;margin-bottom:8px}
+.login-title{font-size:32px;margin:0 0 8px}
+.login-sub{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+label{display:block;font-size:11px;color:#86a89b;text-transform:uppercase;letter-spacing:1.4px;margin:15px 0 7px}
+.input,textarea,select{
+  width:100%;padding:12px;background:#07100d;border:1px solid #1e3e31;color:var(--text);outline:none
+}
+.input:focus,textarea:focus,select:focus{border-color:var(--green-dim);box-shadow:0 0 0 2px rgba(93,255,155,.08)}
+.btn{
+  border:1px solid #27523f;background:#0d1b16;color:#a9e9c1;padding:11px 14px;transition:.18s;box-shadow:inset 0 0 12px rgba(60,255,160,.025)
+}
+.btn:hover{border-color:var(--green2);color:#eafff1;transform:translateY(-1px)}
+.btn.primary{background:#123321;border-color:#2b9259;color:var(--green)}
+.btn.danger{background:#351116;border-color:#9c323a;color:#ff7b82;box-shadow:0 0 20px rgba(255,50,60,.06)}
+.btn.warn{background:#332b12;border-color:#8f7523;color:var(--yellow)}
+.wide{width:100%}
+.error{color:#ff737b;min-height:18px;font-size:12px;margin-top:10px}
+#app{min-height:100vh;padding:18px;display:grid;grid-template-columns:250px 1fr;gap:14px}
+.sidebar{
+  background:linear-gradient(180deg,rgba(11,20,17,.98),rgba(7,13,10,.98));border:1px solid var(--line);padding:16px;position:sticky;top:18px;height:calc(100vh - 36px);overflow:auto
+}
+.brand{border-bottom:1px solid var(--line);padding-bottom:15px;margin-bottom:15px}
+.brand-code{font-size:11px;color:var(--green-dim);letter-spacing:3px}
+.brand-name{font-size:24px;color:var(--green);margin:5px 0}
+.brand-loc{font-size:11px;color:var(--muted)}
+.nav-btn{
+  width:100%;text-align:left;border:1px solid transparent;background:transparent;color:#94b7a8;padding:11px 10px;margin:3px 0;letter-spacing:.5px
+}
+.nav-btn:hover,.nav-btn.active{background:#0d1b16;border-color:#1d3c30;color:var(--green)}
+.sidebar-footer{position:absolute;left:16px;right:16px;bottom:14px;border-top:1px solid var(--line);padding-top:12px}
+.user-card{font-size:12px;line-height:1.6}
+.user-card b{color:var(--text)}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);margin-right:6px}
+.main{min-width:0}
+.topbar{
+  display:flex;justify-content:space-between;gap:15px;align-items:center;border:1px solid var(--line);background:rgba(9,18,14,.96);padding:13px 15px;margin-bottom:14px
+}
+.top-left{display:flex;gap:14px;align-items:center}
+.sys-state{font-size:11px;color:var(--muted)}
+.clock{font-size:19px;color:var(--green)}
+.breadcrumb{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.page{display:none}
+.page.active{display:block}
+.grid{display:grid;gap:14px}
+.grid.stats{grid-template-columns:repeat(5,minmax(0,1fr))}
+.card{
+  background:linear-gradient(180deg,rgba(13,25,20,.98),rgba(8,16,12,.98));border:1px solid var(--line);padding:15px;box-shadow:var(--shadow)
+}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.card-title{font-size:11px;letter-spacing:1.2px;color:#8db0a1;text-transform:uppercase}
+.big{font-size:28px;color:var(--green)}
+.small{font-size:11px;color:var(--muted)}
+.badge{font-size:10px;padding:4px 7px;border:1px solid #285540;background:#0c1c15;color:#86e5ab}
+.badge.red{border-color:#743036;color:#ff7d83;background:#291115}
+.badge.yellow{border-color:#665520;color:#f4d16a;background:#27220f}
+.badge.cyan{border-color:#25576a;color:#6ee7ff;background:#0d1b21}
+.threat-row{display:flex;gap:5px;margin-top:10px}
+.threat-dot{height:8px;flex:1;background:#16231d;border:1px solid #214333}
+.threat-dot.on{background:var(--red);border-color:#ff5d67;box-shadow:0 0 8px rgba(255,78,88,.4)}
+.stock-item{display:grid;grid-template-columns:85px 1fr 55px;align-items:center;gap:8px;margin:10px 0}
+.stock-name{font-size:11px;color:#bdd4ca}
+.stock-bar{height:7px;background:#12201a;border:1px solid #1e3b2e}
+.stock-fill{height:100%;background:linear-gradient(90deg,#1e8f51,var(--green));transition:width .25s}
+.stock-num{text-align:right;font-size:12px;color:#9fd0b4}
+.dashboard-grid{display:grid;grid-template-columns:1.25fr .85fr;gap:14px;margin-top:14px}
+.alerts{max-height:460px;overflow:auto}
+.alert{
+  border:1px solid #244333;background:#0a1712;padding:12px;margin:8px 0;animation:slideIn .28s ease;position:relative
+}
+.alert.red{border-color:#6a2a31;background:#1a0f11}
+.alert.yellow{border-color:#65531d;background:#19170e}
+.alert-top{display:flex;justify-content:space-between;gap:10px}
+.alert-title{font-size:12px;color:#bce8cd;font-weight:700}
+.alert.red .alert-title{color:#ff8b91}
+.alert-time{font-size:10px;color:#628777}
+.alert-body{font-size:12px;color:#91aca1;line-height:1.55;margin-top:7px}
+.alert-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.x-btn{border:1px solid #403a3a;background:#171314;color:#8e8e8e;padding:2px 7px}
+.x-btn:hover{color:#fff;border-color:#666}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.section-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.log-list{max-height:450px;overflow:auto}
+.log-entry{padding:9px 0;border-bottom:1px dashed #1d3329;font-size:12px;line-height:1.5}
+.log-entry .meta{color:#5f8374;font-size:10px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:18px;z-index:10000
+}
+.modal.show{display:flex}
+.modal-box{
+  width:min(720px,100%);max-height:90vh;overflow:auto;background:#08110e;border:1px solid #2b5d45;box-shadow:0 0 50px rgba(0,0,0,.5);padding:18px
+}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.modal-title{color:var(--green);font-size:17px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid .full{grid-column:1/-1}
+.terminal-mini{background:#030705;border:1px solid #173227;padding:10px;color:#72d99d;height:140px;overflow:auto;font-size:12px;line-height:1.6}
+.emergency{
+  font-size:17px;letter-spacing:1px;padding:16px;border:1px solid #b62f39;background:#55131a;color:#ff9ca1;box-shadow:0 0 26px rgba(255,53,62,.12);width:100%
+}
+.emergency:hover{background:#6f171f;box-shadow:0 0 35px rgba(255,53,62,.2)}
+.radar{
+  min-height:320px;display:grid;place-items:center;background:
+  radial-gradient(circle,rgba(35,145,86,.15) 0 2px,transparent 3px),
+  repeating-radial-gradient(circle,transparent 0 34px,rgba(65,135,95,.15) 35px 36px),
+  linear-gradient(rgba(90,255,155,.13) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(90,255,155,.13) 1px,transparent 1px);
+  background-size:auto,auto,35px 35px,35px 35px;border:1px solid #25533e;position:relative;overflow:hidden
+}
+.radar:before{
+  content:"";position:absolute;width:46%;height:46%;border-radius:50%;border-left:2px solid var(--green);transform-origin:100% 100%;animation:sweep 2.8s linear infinite;left:4%;top:4%;box-shadow:0 0 20px rgba(93,255,155,.35)
+}
+.radar.off{filter:grayscale(.9);opacity:.6}
+.radar.off:before{animation-play-state:paused;border-color:#777}
+.radar-center{width:18px;height:18px;border-radius:50%;background:var(--green);box-shadow:0 0 15px var(--green);z-index:2}
+.radar-label{position:absolute;bottom:10px;left:10px;font-size:10px;color:#6f9d87}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.cheat-watermark{
+  position:fixed;right:9px;bottom:6px;color:#365144;font-size:9px;letter-spacing:1px;opacity:.45;z-index:99999;user-select:none
+}
+.cheat-watermark:hover{opacity:.9;color:#5d806d}
+.progress-wide{height:12px}
+.inline{display:flex;gap:7px;align-items:center}
+.kbd{border:1px solid #2b4037;background:#0a1511;padding:2px 5px;color:#8bb29f;font-size:10px}
+.toast-wrap{position:fixed;right:16px;top:16px;display:flex;flex-direction:column;gap:9px;z-index:12000;width:min(360px,calc(100vw - 32px))}
+.toast{border:1px solid #24533d;background:#09140f;padding:10px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:slideIn .22s ease}
+.toast.red{border-color:#803038;background:#1b0e10}
+.toast strong{color:var(--green)}
+.toast.red strong{color:#ff8990}
+.footer-note{font-size:10px;color:#456a5a;margin-top:14px}
+@media(max-width:1000px){
+  #app{grid-template-columns:1fr}
+  .sidebar{position:static;height:auto}
+  .sidebar-footer{position:static;margin-top:14px}
+  .grid.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dashboard-grid,.section-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  #app{padding:9px;gap:9px}
+  .grid.stats{grid-template-columns:1fr}
+  .topbar{flex-direction:column;align-items:flex-start}
+  .form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="boot">
+  <div class="boot-box">
+    <div class="boot-title">HORYZONT-3</div>
+    <p class="boot-sub">WOJSKOWY SYSTEM ZARZĄDZANIA PLACÓWKĄ // TRYB APOKALIPSY</p>
+    <div class="terminal" id="bootTerminal"></div>
+    <div class="progress"><span id="bootProgress"></span></div>
+    <div class="footer-note">Uruchamianie modułów obrony, logów i łączności...</div>
+  </div>
+</div>
+
+<div id="login" class="hidden">
+  <div class="login-box">
+    <div class="login-mark">H3 // AUTORYZACJA</div>
+    <h1 class="login-title">DOSTĘP DO SYSTEMU</h1>
+    <div class="login-sub">Wprowadź hasło placówki. Po autoryzacji system poprosi o stopień i nazwisko operatora.</div>
+    <label for="loginPassword">Hasło</label>
+    <input id="loginPassword" class="input" type="password" placeholder="••••••••">
+    <button class="btn primary wide" style="margin-top:14px" id="loginBtn">ZALOGUJ</button>
+    <div class="error" id="loginError"></div>
+  </div>
+</div>
+
+<div id="operatorSetup" class="modal">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-head">
+      <div class="modal-title">IDENTYFIKACJA OPERATORA</div>
+    </div>
+    <div class="form-grid">
+      <div>
+        <label>Stopień</label>
+        <select id="setupRank">
+          <option>Kapral</option><option>Sierżant</option><option>Starszy sierżant</option>
+          <option>Porucznik</option><option>Kapitan</option><option>Major</option>
+          <option>Pułkownik</option><option>Dowódca placówki</option>
+        </select>
+      </div>
+      <div>
+        <label>Nazwisko</label>
+        <input id="setupName" class="input" placeholder="np. Kowalski">
+      </div>
+    </div>
+    <button class="btn primary wide" style="margin-top:16px" id="setupBtn">POTWIERDŹ TOŻSAMOŚĆ</button>
+    <div class="error" id="setupError"></div>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-code">PLACÓWKA // H3</div>
+      <div class="brand-name glow">HORYZONT-3</div>
+      <div class="brand-loc">SEKTOR 03 · STREFOWA BAZA OBRONNA</div>
+    </div>
+    <button class="nav-btn active" data-page="dashboard">▣ DASHBOARD</button>
+    <button class="nav-btn" data-page="radarPage">◉ RADAR</button>
+    <button class="nav-btn" data-page="reportsPage">✎ RAPORTY</button>
+    <button class="nav-btn" data-page="resourcesPage">▤ ZASOBY</button>
+    <button class="nav-btn" data-page="logsPage">≡ LOGI SYSTEMOWE</button>
+    <button class="nav-btn" data-page="savePage">▣ ZAPIS GRY</button>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <span class="status-dot"></span><b id="sideUser">Operator</b><br>
+        <span id="sideRank">—</span>
+      </div>
+      <div class="footer-note">Sieć lokalna: <span style="color:var(--green)">AKTYWNA</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="top-left">
+        <div>
+          <div class="breadcrumb" id="pageTitle">CENTRUM DOWODZENIA</div>
+          <div class="clock" id="gameClock">Dzień 1 | 00:00</div>
+        </div>
+      </div>
+      <div class="inline">
+        <span class="badge cyan" id="radarTop">RADAR: ONLINE</span>
+        <span class="badge" id="threatTop">ZAGROŻENIE: 1/5</span>
+      </div>
+    </div>
+
+    <section id="dashboard" class="page active">
+      <div class="grid stats">
+        <div class="card">
+          <div class="card-title">Czas misji</div>
+          <div class="big" id="dashTime">Dzień 1</div>
+          <div class="small" id="dashClock">00:00</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Poziom zagrożenia</div>
+          <div class="big" id="dashThreat">1 / 5</div>
+          <div class="threat-row" id="threatBars"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Status radaru</div>
+          <div class="big" id="dashRadar">ONLINE</div>
+          <div class="small" id="radarStatusText">Zasięg nominalny</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Operator</div>
+          <div class="big" style="font-size:20px" id="dashUser">—</div>
+          <div class="small" id="dashRank">—</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Czas do autozdarzenia</div>
+          <div class="big" id="eventCountdown">—</div>
+          <div class="small">losowy interwał systemowy</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Stan zapasów</div>
+            <span class="badge" id="stockState">NOMINALNY</span>
+          </div>
+          <div id="stockDashboard"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Aktywne powiadomienia</div>
+            <span class="badge red" id="alertCount">0</span>
+          </div>
+          <div class="alerts" id="alertList"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="card-head">
+          <div class="card-title">Szybkie działania</div>
+        </div>
+        <div class="toolbar">
+          <button class="btn primary" onclick="checkRadar()">SPRAWDŹ RADAR</button>
+          <button class="btn" onclick="openReportModal()">NAPISZ RAPORT</button>
+          <button class="btn warn" onclick="openResourceModal()">WNIOSEK O ZASOBY</button>
+          <button class="btn" onclick="switchPage('logsPage')">PRZEGLĄDAJ LOGI</button>
+          <button class="btn" onclick="saveGame(true)">ZAPISZ GRĘ</button>
+          <button class="btn" onclick="loadGame(true)">WCZYTAJ GRĘ</button>
+          <button class="emergency" onclick="sendEmergency()">!!! WYŚLIJ EMERGENCY !!!</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="radarPage" class="page">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">MODUŁ RADAROWY XR-7</div>
+            <div class="small">Monitorowanie sektora i wykrywanie aktywności biologicznej</div>
+          </div>
+          <span class="badge cyan" id="radarPageStatus">ONLINE</span>
+        </div>
+        <div class="radar" id="radarVisual">
+          <div class="radar-center"></div>
+          <div class="radar-label">SEKTOR 03 / ZASIĘG 18 km / SKAN 360°</div>
+        </div>
+        <div class="toolbar" style="margin-top:12px">
+          <button class="btn primary" onclick="checkRadar()">WYKONAJ PEŁNY SKAN</button>
+          <button class="btn warn" onclick="repairRadarNow()">NAPRAWA RADARU</button>
+        </div>
+        <div id="radarReadout" class="terminal-mini" style="margin-top:12px"></div>
+      </div>
+    </section>
+
+    <section id="reportsPage" class="page">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">RAPORTY OPERACYJNE</div>
+          <button class="btn primary" onclick="openReportModal()">NOWY RAPORT</button>
+        </div>
+        <div class="log-list" id="reportList"></div>
+      </div>
+    </section>
+
+    <section id="resourcesPage" class="page">
+      <div class="section-grid">
+        <div class="card">
+          <div class="card-head"><div class="card-title">MAGAZYN</div><span class="badge">ONLINE</span></div>
+          <div id="stockResource"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">WNIOSEK O ZASOBY</div></div>
+          <div class="small">System może wygenerować zapotrzebowanie. Zatwierdzenie wiąże się z niepewnym czasem dostawy.</div>
+          <button class="btn warn wide" style="margin-top:14px" onclick="openResourceModal()">OTWÓRZ WNIOSEK</button>
+          <div id="resourceHistory" class="log-list" style="margin-top:12px"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="logsPage" class="page">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">DZIENNIK SYSTEMOWY</div>
+          <div class="toolbar">
+            <button class="btn" onclick="clearLogs()">WYCZYŚĆ LOGI</button>
+          </div>
+        </div>
+        <div class="log-list" id="systemLogs"></div>
+      </div>
+    </section>
+
+    <section id="savePage" class="page">
+      <div class="section-grid">
+        <div class="card">
+          <div class="card-head"><div class="card-title">PUNKT ZAPISU</div><span class="badge" id="saveStatus">BRAK INFORMACJI</span></div>
+          <div class="small">Stan gry jest zapisywany lokalnie w przeglądarce. Odświeżenie strony nie powinno usuwać postępu.</div>
+          <div class="toolbar" style="margin-top:14px">
+            <button class="btn primary" onclick="saveGame(true)">ZAPISZ TERAZ</button>
+            <button class="btn" onclick="loadGame(true)">WCZYTAJ ZAPIS</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">INFORMACJE SESJI</div></div>
+          <div id="sessionInfo" class="small" style="line-height:2"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="reportModal">
+  <div class="modal-box">
+    <div class="modal-head"><div class="modal-title">NOWY RAPORT OPERACYJNY</div><button class="x-btn" onclick="closeModal('reportModal')">X</button></div>
+    <label>Tytuł</label>
+    <input id="reportTitle" class="input" placeholder="np. Kontakt z grupą przy drodze">
+    <label>Treść raportu</label>
+    <textarea id="reportText" rows="8" placeholder="Opisz sytuację, działania i zalecenia..."></textarea>
+    <div class="toolbar" style="margin-top:12px">
+      <button class="btn primary" onclick="submitReport()">ZAPISZ RAPORT</button>
+      <button class="btn" onclick="closeModal('reportModal')">ANULUJ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="resourceModal">
+  <div class="modal-box">
+    <div class="modal-head"><div class="modal-title">WNIOSEK O ZASOBY</div><button class="x-btn" onclick="closeModal('resourceModal')">X</button></div>
+    <div class="form-grid">
+      <div><label>Jedzenie</label><input id="reqFood" class="input" type="number" min="0" value="10"></div>
+      <div><label>Amunicja</label><input id="reqAmmo" class="input" type="number" min="0" value="15"></div>
+      <div><label>Paliwo</label><input id="reqFuel" class="input" type="number" min="0" value="8"></div>
+      <div><label>Leki</label><input id="reqMeds" class="input" type="number" min="0" value="5"></div>
+      <div><label>Części</label><input id="reqParts" class="input" type="number" min="0" value="4"></div>
+      <div><label>Priorytet</label><select id="reqPriority"><option>STANDARDOWY</option><option>WYSOKI</option><option>KRYTYCZNY</option></select></div>
+    </div>
+    <label>Uzasadnienie</label>
+    <textarea id="reqReason" rows="4" placeholder="Powód zapotrzebowania..."></textarea>
+    <div class="toolbar" style="margin-top:12px">
+      <button class="btn warn" onclick="submitResourceRequest()">WYŚLIJ WNIOSEK</button>
+      <button class="btn" onclick="closeModal('resourceModal')">ANULUJ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="cheatCodeModal">
+  <div class="modal-box" style="max-width:440px">
+    <div class="modal-head"><div class="modal-title">HORIZON-9™ // DOSTĘP</div><button class="x-btn" onclick="closeModal('cheatCodeModal')">X</button></div>
+    <div class="small">Wprowadź kod autoryzacyjny.</div>
+    <label>Kod</label>
+    <input id="cheatCode" class="input" type="password" placeholder="•••">
+    <button class="btn primary wide" style="margin-top:12px" onclick="unlockCheat()">ODBLOKUJ</button>
+    <div class="error" id="cheatError"></div>
+  </div>
+</div>
+
+<div class="modal" id="cheatModal">
+  <div class="modal-box">
+    <div class="modal-head"><div class="modal-title">HORIZON-9™ // TAJNE MENU CHEATÓW</div><button class="x-btn" onclick="closeModal('cheatModal')">X</button></div>
+    <div class="form-grid">
+      <div>
+        <label>Dzień</label>
+        <input id="cheatDay" class="input" type="number" min="1">
+      </div>
+      <div>
+        <label>Godzina</label>
+        <input id="cheatHour" class="input" type="number" min="0" max="23">
+      </div>
+      <div>
+        <label>Minuta</label>
+        <input id="cheatMinute" class="input" type="number" min="0" max="59">
+      </div>
+      <div>
+        <label>Zagrożenie</label>
+        <select id="cheatThreat"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+      </div>
+      <div>
+        <label>Stopień</label>
+        <input id="cheatRank" class="input">
+      </div>
+      <div>
+        <label>Imię / nazwisko</label>
+        <input id="cheatName" class="input">
+      </div>
+      <div class="full">
+        <label>Nowe hasło</label>
+        <input id="cheatPassword" class="input" type="text">
+      </div>
+      <div class="full">
+        <label>Własne wydarzenie / powiadomienie</label>
+        <input id="cheatEventTitle" class="input" placeholder="Tytuł wydarzenia">
+      </div>
+      <div class="full">
+        <textarea id="cheatEventBody" rows="4" placeholder="Treść wydarzenia..."></textarea>
+      </div>
+    </div>
+    <div class="toolbar" style="margin-top:12px">
+      <button class="btn primary" onclick="applyCheatState()">ZASTOSUJ ZMIANY</button>
+      <button class="btn" onclick="cheatRefill()">UZUPEŁNIJ ZAPASY</button>
+      <button class="btn warn" onclick="repairRadarNow()">NAPRAW RADAR</button>
+      <button class="btn" onclick="addCustomEventFromCheat()">DODAJ WYDARZENIE</button>
+    </div>
+    <div class="footer-note">Kod dostępu: 123</div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="cheat-watermark" onclick="openModal('cheatCodeModal')" title="Horizon-9™">Horizon-9™</div>
+
+<script>
+const DEFAULTS = {
+  password: "horyzont",
+  day: 1,
+  hour: 0,
+  minute: 0,
+  threat: 1,
+  radar: {online:true, damaged:false, repairAt:null},
+  operator: {name:"",rank:""},
+  stock: {food:72,ammo:66,fuel:58,meds:61,parts:44},
+  alerts: [],
+  logs: [],
+  reports: [],
+  requests: [],
+  totalSeconds: 0,
+  lastSavedAt: null
+};
+
+let state = structuredClone(DEFAULTS);
+let initialized = false;
+let lastTick = Date.now();
+let nextAutoEventAt = Date.now() + rand(18000,34000);
+
+const $ = id => document.getElementById(id);
+const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const clamp = (v,min,max) => Math.max(min,Math.min(max,v));
+
+function cloneDefault(){ return structuredClone(DEFAULTS); }
+
+function formatTime(){
+  return `Dzień ${state.day} | ${String(state.hour).padStart(2,'0')}:${String(state.minute).padStart(2,'0')}`;
+}
+function formatClockOnly(){ return `${String(state.hour).padStart(2,'0')}:${String(state.minute).padStart(2,'0')}`; }
+function nowStamp(){ return `${formatTime()}`; }
+
+function log(text, type="INFO"){
+  state.logs.unshift({time:nowStamp(),type,text});
+  if(state.logs.length>300) state.logs.length=300;
+  renderLogs();
+}
+function toast(text, danger=false){
+  const el=document.createElement("div");
+  el.className="toast"+(danger?" red":"");
+  el.innerHTML=`<strong>${danger?"ALERT":"SYSTEM"}</strong><div style="font-size:12px;margin-top:4px;color:#a4beb3">${escapeHtml(text)}</div>`;
+  $("toastWrap").appendChild(el);
+  setTimeout(()=>el.remove(),4200);
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+function loadPersisted(){
+  state=cloneDefault();
+  try{
+    if(typeof localStorage === "undefined") return;
+    const raw=localStorage.getItem("horyzont3_save");
+    if(raw){
+      const parsed=JSON.parse(raw);
+      state=mergeState(cloneDefault(), parsed);
+    }
+  }catch(e){
+    // Niektóre przeglądarki blokują localStorage dla plików file://.
+    // System nadal działa, tylko zapis trwały może być niedostępny.
+    state=cloneDefault();
+  }
+}
+function mergeState(base, src){
+  const out={...base,...src};
+  out.radar={...base.radar,...(src.radar||{})};
+  out.operator={...base.operator,...(src.operator||{})};
+  out.stock={...base.stock,...(src.stock||{})};
+  out.alerts=Array.isArray(src.alerts)?src.alerts:[];
+  out.logs=Array.isArray(src.logs)?src.logs:[];
+  out.reports=Array.isArray(src.reports)?src.reports:[];
+  out.requests=Array.isArray(src.requests)?src.requests:[];
+  return out;
+}
+function saveGame(showToast=false){
+  state.lastSavedAt = new Date().toISOString();
+  try{
+    localStorage.setItem("horyzont3_save",JSON.stringify(state));
+    $("saveStatus").textContent="ZAPISANO";
+    if(showToast) toast("Stan gry został zapisany lokalnie.");
+  }catch(e){
+    $("saveStatus").textContent="PAMIĘĆ NIEDOSTĘPNA";
+    if(showToast) toast("Przeglądarka blokuje localStorage dla tego pliku. Uruchom plik przez lokalny serwer HTTP, jeśli chcesz trwały zapis.",true);
+  }
+}
+function loadGame(showToast=false){
+  let raw=null;
+  try{ raw=localStorage.getItem("horyzont3_save"); }catch(e){}
+  if(!raw){ if(showToast) toast("Brak dostępnego zapisu.",true); return; }
+  try{
+    state=mergeState(cloneDefault(),JSON.parse(raw));
+    renderAll();
+    if(showToast) toast("Stan gry został wczytany.");
+    log("Wczytano zapis gry z pamięci lokalnej.");
+  }catch(e){
+    if(showToast) toast("Nie udało się odczytać zapisu.",true);
+  }
+}
+
+function boot(){
+  try { loadPersisted(); } catch(e) { state=cloneDefault(); }
+  const lines=[
+    "[BOOT] Łączenie z rdzeniem HORYZONT-3...",
+    "[OK] Moduł kontroli dostępu",
+    "[OK] Moduł magazynowy",
+    "[OK] Moduł radarowy XR-7",
+    "[OK] Moduł dziennika systemowego",
+    "[OK] Moduł komunikacji awaryjnej",
+    "[SCAN] Sprawdzanie integralności danych...",
+    "[OK] System gotowy."
+  ];
+  let i=0, p=0;
+  const term=$("bootTerminal"), bar=$("bootProgress");
+  const timer=setInterval(()=>{
+    if(i<lines.length){
+      term.innerHTML += escapeHtml(lines[i])+"<br>";
+      term.scrollTop=term.scrollHeight;
+      i++;
+    }
+    p=Math.min(100,p+Math.ceil(100/lines.length));
+    bar.style.width=p+"%";
+    if(i>=lines.length){
+      clearInterval(timer);
+      setTimeout(()=>{
+        $("boot").classList.add("hidden");
+        $("login").classList.remove("hidden");
+        $("loginPassword").focus();
+      },650);
+    }
+  },280);
+}
+
+$("loginBtn").addEventListener("click",doLogin);
+$("loginPassword").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
+function doLogin(){
+  if($("loginPassword").value!==state.password){
+    $("loginError").textContent="ODMOWA DOSTĘPU // nieprawidłowe hasło";
+    toast("Nieudana próba logowania.",true);
+    return;
+  }
+  $("loginError").textContent="";
+  if(!state.operator.name || !state.operator.rank) openModal("operatorSetup");
+  else startApp();
+}
+$("setupBtn").addEventListener("click",()=>{
+  const name=$("setupName").value.trim();
+  const rank=$("setupRank").value;
+  if(!name){$("setupError").textContent="Podaj nazwisko operatora.";return}
+  state.operator={name,rank};
+  closeModal("operatorSetup");
+  log(`Zalogowano operatora: ${rank} ${name}.`);
+  startApp();
+});
+function startApp(){
+  $("login").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  if(!initialized){
+    initialized=true;
+    renderAll();
+  }
+}
+
+function switchPage(pageId){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  $(pageId).classList.add("active");
+  const btn=document.querySelector(`[data-page="${pageId}"]`);
+  if(btn) btn.classList.add("active");
+  const titles={
+    dashboard:"CENTRUM DOWODZENIA",radarPage:"MODUŁ RADAROWY XR-7",
+    reportsPage:"RAPORTY OPERACYJNE",resourcesPage:"GOSPODARKA ZASOBAMI",
+    logsPage:"DZIENNIK SYSTEMOWY",savePage:"PUNKTY ZAPISU"
+  };
+  $("pageTitle").textContent=titles[pageId]||"SYSTEM HORYZONT-3";
+}
+document.querySelectorAll(".nav-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>switchPage(btn.dataset.page));
+});
+
+function renderAll(){
+  renderClock(); renderThreat(); renderRadar(); renderStocks(); renderAlerts(); renderLogs(); renderReports(); renderRequests(); renderUser(); renderSessionInfo();
+}
+function renderClock(){
+  $("gameClock").textContent=formatTime();
+  $("dashTime").textContent=`Dzień ${state.day}`;
+  $("dashClock").textContent=formatClockOnly();
+}
+function renderThreat(){
+  $("dashThreat").textContent=`${state.threat} / 5`;
+  $("threatTop").textContent=`ZAGROŻENIE: ${state.threat}/5`;
+  $("threatBars").innerHTML="";
+  for(let i=1;i<=5;i++){
+    const d=document.createElement("div");
+    d.className="threat-dot"+(i<=state.threat?" on":"");
+    $("threatBars").appendChild(d);
+  }
+}
+function renderRadar(){
+  const online=state.radar.online && !state.radar.damaged;
+  $("dashRadar").textContent=online?"ONLINE":"AWARIA";
+  $("dashRadar").style.color=online?"var(--green)":"var(--red)";
+  $("radarStatusText").textContent=online?"Zasięg nominalny":"Zasięg ograniczony / potrzebna naprawa";
+  $("radarTop").textContent=online?"RADAR: ONLINE":"RADAR: AWARIA";
+  $("radarTop").className="badge "+(online?"cyan":"red");
+  $("radarPageStatus").textContent=online?"ONLINE":"AWARIA";
+  $("radarPageStatus").className="badge "+(online?"cyan":"red");
+  $("radarVisual").classList.toggle("off",!online);
+}
+const stockLabels={food:"Jedzenie",ammo:"Amunicja",fuel:"Paliwo",meds:"Leki",parts:"Części"};
+function stockHtml(){
+  return Object.entries(stockLabels).map(([k,label])=>{
+    const v=clamp(Math.round(state.stock[k]),0,100);
+    return `<div class="stock-item">
+      <div class="stock-name">${label}</div>
+      <div class="stock-bar"><div class="stock-fill" style="width:${v}%"></div></div>
+      <div class="stock-num">${v}%</div>
+    </div>`;
+  }).join("");
+}
+function renderStocks(){
+  $("stockDashboard").innerHTML=stockHtml();
+  $("stockResource").innerHTML=stockHtml();
+  const minStock=Math.min(...Object.values(state.stock));
+  $("stockState").textContent=minStock<20?"KRYTYCZNY":minStock<40?"NISKI":"NOMINALNY";
+  $("stockState").className="badge "+(minStock<20?"red":minStock<40?"yellow":"");
+}
+function renderAlerts(){
+  $("alertCount").textContent=state.alerts.length;
+  $("alertList").innerHTML="";
+  if(!state.alerts.length){
+    $("alertList").innerHTML='<div class="small" style="padding:15px 0">Brak aktywnych powiadomień. System monitoruje sektor.</div>';
+    return;
+  }
+  state.alerts.forEach(a=>{
+    const el=document.createElement("div");
+    el.className="alert "+(a.level||"");
+    const task=a.task?`<button class="btn ${a.completed?"":"primary"}" onclick="completeAlert('${a.id}')">${a.completed?"WYKONANO":"OZNACZ JAKO WYKONANE"}</button>`:"";
+    el.innerHTML=`
+      <div class="alert-top">
+        <div class="alert-title">${escapeHtml(a.title)}</div>
+        <div class="inline"><span class="alert-time">${escapeHtml(a.time)}</span><button class="x-btn" onclick="removeAlert('${a.id}')">X</button></div>
+      </div>
+      <div class="alert-body">${escapeHtml(a.body)}</div>
+      ${a.task?`<div class="alert-actions">${task}</div>`:""}`;
+    $("alertList").appendChild(el);
+  });
+}
+function renderLogs(){
+  $("systemLogs").innerHTML=state.logs.map(l=>`
+    <div class="log-entry"><div class="meta">${escapeHtml(l.time)} // ${escapeHtml(l.type)}</div>${escapeHtml(l.text)}</div>
+  `).join("") || '<div class="small">Brak logów.</div>';
+}
+function renderReports(){
+  $("reportList").innerHTML=state.reports.map(r=>`
+    <div class="log-entry">
+      <div class="meta">${escapeHtml(r.time)} // ${escapeHtml(r.author)}</div>
+      <div style="color:#bce8cd;margin:3px 0">${escapeHtml(r.title)}</div>
+      <div style="color:#91aca1">${escapeHtml(r.text)}</div>
+    </div>`).join("") || '<div class="small">Brak raportów.</div>';
+}
+function renderRequests(){
+  $("resourceHistory").innerHTML=state.requests.map(r=>`
+    <div class="log-entry"><div class="meta">${escapeHtml(r.time)} // PRIORYTET: ${escapeHtml(r.priority)}</div>
+    ${escapeHtml(r.summary)}<div class="small">${escapeHtml(r.status)}</div></div>
+  `).join("") || '<div class="small">Brak wysłanych wniosków.</div>';
+}
+function renderUser(){
+  const full=`${state.operator.rank} ${state.operator.name}`.trim()||"Operator";
+  $("sideUser").textContent=state.operator.name||"Operator";
+  $("sideRank").textContent=state.operator.rank||"—";
+  $("dashUser").textContent=state.operator.name||"—";
+  $("dashRank").textContent=state.operator.rank||"—";
+}
+function renderSessionInfo(){
+  $("sessionInfo").innerHTML=`
+    Operator: <b style="color:var(--text)">${escapeHtml(state.operator.rank)} ${escapeHtml(state.operator.name)}</b><br>
+    Czas gry: <b style="color:var(--text)">${formatTime()}</b><br>
+    Zagrożenie: <b style="color:var(--text)">${state.threat}/5</b><br>
+    Radar: <b style="color:${state.radar.damaged?"var(--red)":"var(--green)"}">${state.radar.damaged?"AWARIA":"ONLINE"}</b><br>
+    Ostatni zapis: <b style="color:var(--text)">${state.lastSavedAt?new Date(state.lastSavedAt).toLocaleString("pl-PL"):"brak"}</b>
+  `;
+}
+
+function addAlert(title,body,level="",task=false){
+  state.alerts.unshift({
+    id:"a_"+Date.now()+"_"+Math.random().toString(36).slice(2,7),
+    title,body,level,task,completed:false,time:nowStamp()
+  });
+  if(state.alerts.length>40) state.alerts.pop();
+  renderAlerts();
+}
+function removeAlert(id){
+  state.alerts=state.alerts.filter(a=>a.id!==id);
+  renderAlerts();
+}
+function completeAlert(id){
+  const a=state.alerts.find(x=>x.id===id);
+  if(!a) return;
+  if(a.completed) return;
+  a.completed=true;
+  renderAlerts();
+  toast(`Zadanie "${a.title}" oznaczono jako wykonane.`);
+  if(a.title.toLowerCase().includes("radar")){
+    setTimeout(()=>repairRadarNow(),rand(1800,3300));
+  }else{
+    setTimeout(()=>{ removeAlert(id); log(`Zakończono zadanie: ${a.title}.`); },2200);
+  }
+}
+
+function randomEvent(){
+  const events=[
+    ()=>addAlert("WYKRYTO OBIEKT","Krótki kontakt na obrzeżu sektora 03. Klasyfikacja: nieznana.","red",false),
+    ()=>addAlert("ZASZYFROWANA WIADOMOŚĆ","Odebrano transmisję z nieznanego nadajnika. Wymagana analiza treści.","yellow",false),
+    ()=>addAlert("PROBLEMY Z RADAREM","Moduł XR-7 zgłasza spadek jakości sygnału. Zalecana diagnostyka.","red",true),
+    ()=>addAlert("RUCH W STREFIE","Czujniki naziemne wykryły przemieszczanie się kilku obiektów.","red",false),
+    ()=>addAlert("NISKI STAN PALIWA","Poziom paliwa spadł poniżej bezpiecznej wartości operacyjnej.","yellow",false),
+    ()=>addAlert("SYGNAŁ CYWILNY","Krótki sygnał SOS. Brak potwierdzonej pozycji nadawcy.","yellow",false),
+    ()=>addAlert("AWARIA ZASILANIA","Chwilowy spadek napięcia w sektorze magazynowym.","yellow",false)
+  ];
+  const f=events[rand(0,events.length-1)];
+  f();
+  if(Math.random()<0.45) state.threat=clamp(state.threat+(Math.random()<0.55?1:-1),1,5);
+  log("System wygenerował automatyczne zdarzenie.", "EVENT");
+  nextAutoEventAt=Date.now()+rand(18000,42000);
+  renderAll();
+}
+function checkRadar(){
+  if(state.radar.damaged){
+    addAlert("RADAR NIEDOSTĘPNY","Nie można wykonać pełnego skanu, dopóki moduł XR-7 nie zostanie naprawiony.","red",true);
+    toast("Radar jest uszkodzony.",true);
+    return;
+  }
+  const readouts=[
+    "SKAN 360° rozpoczęty...",
+    "Sektor 01: czysty",
+    "Sektor 02: 1 słaby kontakt",
+    "Sektor 03: czysty",
+    "Sektor 04: aktywność niestabilna",
+    "Analiza sygnatur biologicznych...",
+    "SKAN ZAKOŃCZONY."
+  ];
+  const box=$("radarReadout");
+  box.innerHTML="";
+  let i=0;
+  const id=setInterval(()=>{
+    box.innerHTML+=escapeHtml(readouts[i])+"<br>";
+    box.scrollTop=box.scrollHeight;
+    i++;
+    if(i>=readouts.length){
+      clearInterval(id);
+      log("Wykonano pełny skan radaru XR-7.");
+      toast("Skan radaru zakończony.");
+      if(Math.random()<0.35) addAlert("KONTAKT RADAROWY","Wykryto anomalię 6,2 km na północ. Zalecana obserwacja.","red",false);
+    }
+  },260);
+}
+function repairRadarNow(){
+  state.radar.damaged=false;
+  state.radar.online=true;
+  state.radar.repairAt=null;
+  state.alerts=state.alerts.filter(a=>!a.title.toLowerCase().includes("radar"));
+  renderAll();
+  log("Radar XR-7 przywrócono do pełnej sprawności.");
+  toast("Radar został natychmiast naprawiony.");
+}
+
+function sendEmergency(){
+  state.threat=clamp(state.threat+1,1,5);
+  addAlert("EMERGENCY NADANY","Pakiet awaryjny wysłano na częstotliwość ratunkową. Oczekiwanie na odpowiedź.","red",false);
+  log("Wysłano sygnał EMERGENCY.", "EMERGENCY");
+  toast("EMERGENCY wysłany.",true);
+  if(Math.random()<0.4){
+    state.stock.ammo=clamp(state.stock.ammo-3,0,100);
+    state.stock.fuel=clamp(state.stock.fuel-2,0,100);
+  }
+  renderAll();
+}
+
+function openReportModal(){
+  $("reportTitle").value=""; $("reportText").value="";
+  openModal("reportModal");
+}
+function submitReport(){
+  const title=$("reportTitle").value.trim(), text=$("reportText").value.trim();
+  if(!title || !text){toast("Uzupełnij tytuł i treść raportu.",true);return}
+  state.reports.unshift({time:nowStamp(),author:`${state.operator.rank} ${state.operator.name}`,title,text});
+  log(`Dodano raport: ${title}.`);
+  closeModal("reportModal");
+  renderReports();
+  toast("Raport zapisany.");
+}
+
+function openResourceModal(){ openModal("resourceModal"); }
+function submitResourceRequest(){
+  const vals={
+    food:+$("reqFood").value||0,ammo:+$("reqAmmo").value||0,fuel:+$("reqFuel").value||0,
+    meds:+$("reqMeds").value||0,parts:+$("reqParts").value||0
+  };
+  const total=Object.values(vals).reduce((a,b)=>a+b,0);
+  if(total<=0){toast("Wniosek musi zawierać przynajmniej jeden zasób.",true);return}
+  const req={
+    time:nowStamp(),priority:$("reqPriority").value,
+    summary:`Jedzenie ${vals.food}, amunicja ${vals.ammo}, paliwo ${vals.fuel}, leki ${vals.meds}, części ${vals.parts}.`,
+    status:"OCZEKUJE NA TRANSPORT"
+  };
+  state.requests.unshift(req);
+  log(`Wysłano wniosek o zasoby (${req.priority}).`);
+  closeModal("resourceModal");
+  renderRequests();
+  toast("Wniosek został wysłany.");
+  setTimeout(()=>{
+    const r=state.requests.find(x=>x===req);
+    if(!r) return;
+    const chance=req.priority==="KRYTYCZNY"?.9:req.priority==="WYSOKI"?.75:.55;
+    if(Math.random()<chance){
+      Object.entries(vals).forEach(([k,v])=>state.stock[k]=clamp(state.stock[k]+v,0,100));
+      r.status="DOSTARCZONO";
+      log("Transport zasobów dotarł do placówki.","SUPPLY");
+      toast("Dostawa zasobów dotarła.");
+    }else{
+      r.status="OPÓŹNIONO";
+      log("Transport zasobów został opóźniony.","SUPPLY");
+      toast("Transport zasobów opóźniony.",true);
+    }
+    renderAll();
+  },rand(4500,9000));
+}
+
+function clearLogs(){
+  state.logs=[];
+  renderLogs();
+  toast("Dziennik systemowy wyczyszczony.");
+}
+
+function openModal(id){ $(id).classList.add("show"); }
+function closeModal(id){ $(id).classList.remove("show"); }
+
+function unlockCheat(){
+  if($("cheatCode").value!=="123"){
+    $("cheatError").textContent="Nieprawidłowy kod.";
+    return;
+  }
+  $("cheatError").textContent="";
+  $("cheatCode").value="";
+  $("cheatDay").value=state.day;
+  $("cheatHour").value=state.hour;
+  $("cheatMinute").value=state.minute;
+  $("cheatThreat").value=state.threat;
+  $("cheatRank").value=state.operator.rank;
+  $("cheatName").value=state.operator.name;
+  $("cheatPassword").value=state.password;
+  $("cheatEventTitle").value="";
+  $("cheatEventBody").value="";
+  closeModal("cheatCodeModal");
+  openModal("cheatModal");
+}
+function applyCheatState(){
+  state.day=Math.max(1,+$("cheatDay").value||1);
+  state.hour=clamp(+$("cheatHour").value||0,0,23);
+  state.minute=clamp(+$("cheatMinute").value||0,0,59);
+  state.threat=clamp(+$("cheatThreat").value||1,1,5);
+  state.operator.rank=$("cheatRank").value.trim()||state.operator.rank;
+  state.operator.name=$("cheatName").value.trim()||state.operator.name;
+  state.password=$("cheatPassword").value||state.password;
+  log("Horizon-9™: zmieniono parametry stanu gry.","CHEAT");
+  renderAll(); saveGame(false); toast("Zmiany cheatów zastosowane.");
+}
+function cheatRefill(){
+  Object.keys(state.stock).forEach(k=>state.stock[k]=100);
+  log("Horizon-9™: zapasy uzupełnione do 100%.","CHEAT");
+  renderStocks(); saveGame(false); toast("Zapasy uzupełnione.");
+}
+function addCustomEventFromCheat(){
+  const t=$("cheatEventTitle").value.trim(), b=$("cheatEventBody").value.trim();
+  if(!t || !b){toast("Podaj tytuł i treść wydarzenia.",true);return}
+  addAlert(t,b,"yellow",false);
+  log(`Horizon-9™: dodano własne wydarzenie "${t}".`,"CHEAT");
+  $("cheatEventTitle").value=""; $("cheatEventBody").value="";
+}
+window.completeAlert=completeAlert; window.removeAlert=removeAlert; window.checkRadar=checkRadar;
+window.repairRadarNow=repairRadarNow; window.sendEmergency=sendEmergency; window.openReportModal=openReportModal;
+window.openResourceModal=openResourceModal; window.switchPage=switchPage; window.saveGame=saveGame;
+window.loadGame=loadGame; window.clearLogs=clearLogs; window.openModal=openModal; window.closeModal=closeModal;
+window.unlockCheat=unlockCheat; window.applyCheatState=applyCheatState; window.cheatRefill=cheatRefill;
+window.addCustomEventFromCheat=addCustomEventFromCheat;
+
+setInterval(()=>{
+  if(!initialized) return;
+  const now=Date.now();
+  const elapsed=now-lastTick;
+  if(elapsed>=1000){
+    const secs=Math.floor(elapsed/1000);
+    lastTick+=secs*1000;
+    state.totalSeconds+=secs;
+    // 1 real second = 1 game minute
+    state.minute+=secs;
+    while(state.minute>=60){state.minute-=60;state.hour++}
+    while(state.hour>=24){state.hour-=24;state.day++}
+    renderClock();
+    const remain=Math.max(0,Math.ceil((nextAutoEventAt-Date.now())/1000));
+    $("eventCountdown").textContent=remain+" s";
+    if(Date.now()>=nextAutoEventAt){ randomEvent(); }
+    // lekkie, losowe zużycie zasobów
+    if(Math.random()<0.035){
+      state.stock.food=clamp(state.stock.food-1,0,100);
+      if(Math.random()<0.25) state.stock.fuel=clamp(state.stock.fuel-1,0,100);
+      if(Math.random()<0.2) state.stock.ammo=clamp(state.stock.ammo-1,0,100);
+      renderStocks();
+    }
+    // awaria radaru niezależna od wydarzeń
+    if(!state.radar.damaged && Math.random()<0.002){
+      state.radar.damaged=true; state.radar.online=false;
+      addAlert("AWARIA RADARU","XR-7 utracił stabilny zasięg. Wymagane zadanie naprawcze.","red",true);
+      log("Radar XR-7 uległ awarii.","FAULT");
+      renderRadar();
+      toast("AWARIA RADARU.",true);
+    }
+  }
+},250);
+
+setInterval(()=>{ if(initialized) saveGame(false); },15000);
+
+window.addEventListener("beforeunload",()=>{ if(initialized) saveGame(false); });
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    document.querySelectorAll(".modal.show").forEach(m=>m.classList.remove("show"));
+  }
+});
+
+boot();
+</script>
+</body>
+</html>
